@@ -1,0 +1,42 @@
+.main-container {
+    margin: 0px 200px;
+}
+
+.form-container {
+    text-align: center;
+}
+.form-container .form{
+    display: inline-block;
+}
+.form-container select, .form-container button {
+    display: block;
+    margin: 5px;
+    width: 300px;
+}
+
+.form-container button {
+    color:blue;
+    background-color:#c9c9ff;
+    border: unset;
+    border-radius: 25px;
+}
+
+.form-container button:hover {
+    background-color: #dbdbff;
+}
+
+.form-container .form span {
+    color:green;
+}
+
+@media screen and (max-width:1200px) {
+    .main-container {
+        margin: 0px 50px;
+    }
+}
+
+@media screen and (max-width:768px) {
+    .main-container {
+        margin: unset;
+    }
+}
