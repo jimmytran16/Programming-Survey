@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import './style.css'
 import BarComponent from '../BarComponent/BarComponent';
+import { validateIfVoted,listUserAsVoted } from './helpers';
 
 export default function Main() {
     // states
@@ -73,14 +74,14 @@ export default function Main() {
     // function to handle the vote submission
     function handleSubmission(e) {
         // check if the user already voted
-        if (!localStorage.getItem('vote')) {
+        if (!(validateIfVoted())) {
             axios.post('http://localhost:3001/submitVote', {
                 option: option
             })
                 .then(response => {
                     console.log(response)
                     setMessage('Thanks for voting!')
-                    localStorage.setItem('vote','true');
+                    listUserAsVoted();
                 })
                 .catch(err => console.log(err))
         // if they have voted
