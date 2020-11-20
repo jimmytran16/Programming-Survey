@@ -2,13 +2,19 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import './style.css'
 import BarComponent from '../BarComponent/BarComponent';
-import { validateIfVoted,listUserAsVoted } from './helpers';
+import Button from 'react-bootstrap/Button';
+import { validateIfVoted, listUserAsVoted, LanguageColorMatch, backgroundColors } from '../../helpers/main/helpers';
 
 export default function Main() {
+
     // states
     const [barData, setBarData] = useState({});
-    const [option, setOption] = useState("");
+    const [option, setOption] = useState("None");
     const [message, setMessage] = useState("");
+    const [programmingList, setProgrammingList] = useState([]);
+    const [selectionPreviewStyle, setSelectionPreviewStyle] = useState({
+        color:'red'       
+    })
 
     // graph configurations
     const barOptions = {
@@ -25,10 +31,12 @@ export default function Main() {
             title: {
                 display: true,
                 text: 'Vote Results',
-                fontSize: 25
+                fontSize: 25,
+                fontFamily: 'Xanh Mono, monospace',
+                fontColor: '#212529'
             },
             legend: {
-                display: true,
+                display: false,
                 position: 'top'
             }
         }
@@ -36,29 +44,27 @@ export default function Main() {
     // useEffect to execute everytime there is a change in the message state -- when user submits their first vote
     useEffect(() => {
         // call the API endpoint to get the Vote result data to display on the graph
-        axios.get('http://localhost:3001/')
+        axios.get('https://programmingsurveyserver.herokuapp.com/')
+        // axios.get('http://localhost:3001/')
             .then(response => {
                 let langD = []
                 let langL = []
+                // loop through the data and store the count and programming language to the arrays
                 response.data.data.map(lang => {
                     langD.push(lang.count)
                     langL.push(lang.name)
                 })
                 console.log(langD, langL);
+                setProgrammingList(langL);
                 // set the Bar Data
                 setBarData(
                     {
                         labels: langL,
                         datasets: [
                             {
-                                label: 'votes',
+                                label: 'Vote Count',
                                 data: langD,
-                                backgroundColor: [
-                                    'rgba(255, 99, 132, 0.6)',
-                                    'rgba(54, 162, 235, 0.6)',
-                                    'rgba(255, 206, 86, 0.6)',
-                                    'rgba(75, 192, 192, 0.6)'
-                                ],
+                                backgroundColor: backgroundColors,
                                 borderWidth: 3
                             }
                         ]
@@ -73,9 +79,14 @@ export default function Main() {
 
     // function to handle the vote submission
     function handleSubmission(e) {
+
+        // validate if they have selected a language -- if not prompt them to do so
+        if (!(programmingList.includes(option))) { setMessage('Please select an option!'); return; }
+
         // check if the user already voted
         if (!(validateIfVoted())) {
-            axios.post('http://localhost:3001/submitVote', {
+            axios.post('https://programmingsurveyserver.herokuapp.com/submitVote', {
+            // axios.post('http://localhost:3001/submitVote', {
                 option: option
             })
                 .then(response => {
@@ -84,33 +95,44 @@ export default function Main() {
                     listUserAsVoted();
                 })
                 .catch(err => console.log(err))
-        // if they have voted
-        }else {
+        } else {
             setMessage('You already voted!');
         }
     }
 
+    // function to handle the option selection
+    function handOptionSelection (lang) {
+        setOption(lang);
+        setSelectionPreviewStyle({
+            color:'green'       
+        })
+    }
 
     return (
         <>
             <div className="main-container">
                 <div className="form-container">
-                    <h2>What is your most preferred Programming Language?</h2>
+                    <strong><h2>What is your most preferred Programming Language?</h2></strong>
+                    <div className="selected-option-preview-container">
+                        <p>You selected:</p> <p style={selectionPreviewStyle} className="selected-option"> <strong>{option}</strong> </p>
+                    </div>
                     <div className="form">
-                        <select onChange={(e) => {
-                            console.log(e.target.value);
-                            setOption(e.target.value);
-                        }}>
-                            <option>Select a Language</option>
-                            <option>Java</option>
-                            <option>Python</option>
-                            <option>Javascript</option>
-                            <option>C++</option>
-                        </select>
-                        <button onClick={handleSubmission}>Vote!</button>
+                        <div>
+                            {
+                                // renders the buttons with its corresponding labeled Prog Langs
+                                programmingList.map((lang, index) => {
+                                    return (
+                                        <Button key={index} onClick={(e) => handOptionSelection(lang)} className="prog-lang-btn" variant={LanguageColorMatch[lang]}>{lang}</Button>
+                                    )
+                                })
+                            }
+                        </div>
+                        <button className="vote-btn" onClick={handleSubmission}>VOTE</button>
                         <span>{message}</span>
                     </div>
                 </div>
+                <hr />
+                {/* Renders the bar componenet and passing in data props */}
                 <BarComponent barData={barData} options={barOptions.options} />
             </div>
         </>
