@@ -1,0 +1,8 @@
+.graph-selector-container {
+    display:flex;
+    justify-content: center;
+}
+
+.graph-selector-container button {
+    margin:10px 5px;
+}

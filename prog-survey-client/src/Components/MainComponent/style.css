@@ -64,7 +64,4 @@
     .main-container {
         margin: unset;
     }
-    canvas {
-        height: 250px!important;
-    }
 }
