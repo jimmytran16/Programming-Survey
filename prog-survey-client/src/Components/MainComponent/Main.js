@@ -22,28 +22,7 @@ export default function Main() {
 
     // graph configurations
     const barOptions = {
-        options: {
-            scales: {
-                yAxes: [
-                    {
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }
-                ]
-            },
-            title: {
-                display: true,
-                text: 'Vote Results',
-                fontSize: 25,
-                fontFamily: 'Xanh Mono, monospace',
-                fontColor: '#212529'
-            },
-            legend: {
-                display: false,
-                position: 'top'
-            }
-        }
+        options: barChartOptions
     }
 
 
