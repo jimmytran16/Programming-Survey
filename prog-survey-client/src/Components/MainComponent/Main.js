@@ -6,12 +6,13 @@ import PieComponent from '../PieComponent/PieComponent';
 import LinkComponent from '../LinkComponent/LinkComponent';
 import Button from 'react-bootstrap/Button';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
-import { validateIfVoted, listUserAsVoted, LanguageColorMatch, backgroundColors } from '../../helpers/main/helpers';
+import { validateIfVoted, listUserAsVoted, LanguageColorMatch, backgroundColors, barChartOptions, getPercentageOfData } from '../../helpers/main/helpers';
 
 export default function Main() {
 
     // states
     const [barData, setBarData] = useState({});
+    const [pieData, setPieData] = useState({});
     const [option, setOption] = useState("None");
     const [message, setMessage] = useState("");
     const [programmingList, setProgrammingList] = useState([]);
@@ -44,6 +45,8 @@ export default function Main() {
             }
         }
     }
+
+
     // useEffect to execute everytime there is a change in the message state -- when user submits their first vote
     useEffect(() => {
         // call the API endpoint to get the Vote result data to display on the graph
@@ -73,6 +76,19 @@ export default function Main() {
                         ]
                     }
                 )
+
+                setPieData({
+                    labels: langL,
+                    datasets: [
+                        {
+                            label: 'Vote Count',
+                            data: getPercentageOfData(langD),
+                            backgroundColor: backgroundColors,
+                            borderWidth: 3
+                        }
+                    ]
+                })
+
             })
             .catch(error => console.log(error))
 
@@ -117,9 +133,7 @@ export default function Main() {
                 <div className="main-container">
                     <div className="form-container">
                         <strong><h2>What is your most preferred Programming Language?</h2></strong>
-                        <div className="selected-option-preview-container">
-                            <p>You selected:</p> <p style={selectionPreviewStyle} className="selected-option"> <strong>{option}</strong> </p>
-                        </div>
+                        <hr />
                         <div className="form">
                             <div>
                                 {
@@ -131,6 +145,9 @@ export default function Main() {
                                     })
                                 }
                             </div>
+                            <div className="selected-option-preview-container">
+                                <p>You selected:</p> <p style={selectionPreviewStyle} className="selected-option"> <strong>{option}</strong> </p>
+                            </div>
                             <button className="vote-btn" onClick={handleSubmission}>VOTE</button>
                             <span>{message}</span>
                         </div>
@@ -141,7 +158,7 @@ export default function Main() {
                     <LinkComponent />
                     <Switch>
                         <Route path="/pie">
-                            <PieComponent barData={barData}  />
+                            <PieComponent barData={pieData} />
                         </Route>
                         <Route path="/">
                             <BarComponent barData={barData} options={barOptions.options} />
